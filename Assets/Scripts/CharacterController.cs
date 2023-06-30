@@ -20,6 +20,16 @@ public class CharacterController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKey(KeyCode.W))
+        {
+            m_animator.SetFloat("Speed", 1.0f);
+            return;
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            m_animator.SetFloat("Speed", 1.0f);
+            return;
+        }
         if (Input.GetKey(KeyCode.A))
         {
             m_spriteRenderer.flipX = true;
@@ -32,6 +42,7 @@ public class CharacterController : MonoBehaviour
             m_animator.SetFloat("Speed", 1.0f);
             return;
         }
+
 
         m_animator.SetFloat("Speed", 0.0f);
     }
