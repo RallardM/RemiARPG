@@ -4,11 +4,14 @@ public class CharacterController : MonoBehaviour
 {
     private Animator m_animator;
     private SpriteRenderer m_spriteRenderer;
+    private Rigidbody2D m_playerRigidbody2D;
+    private float m_playerSpeed = 500.0f;
 
     private void Awake()
     {
         m_animator = GetComponent<Animator>();
         m_spriteRenderer = GetComponent<SpriteRenderer>();
+        m_playerRigidbody2D = GetComponent<Rigidbody2D>();
     }
 
     // Start is called before the first frame update
@@ -43,7 +46,33 @@ public class CharacterController : MonoBehaviour
             return;
         }
 
-
         m_animator.SetFloat("Speed", 0.0f);
+    }
+
+    private void FixedUpdate()
+    {
+        Vector2 direction = Vector2.zero;
+
+        if (Input.GetKey(KeyCode.W))
+        {
+            direction += new Vector2(0.0f, 1.0f);
+        }
+
+        if (Input.GetKey(KeyCode.S))
+        {
+            direction += new Vector2(0.0f, -1.0f);
+        }
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            direction += new Vector2(-1.0f, 0.0f);
+        }
+
+        if (Input.GetKey(KeyCode.D))
+        {
+            direction += new Vector2(1.0f, 0.0f);
+        }
+
+        m_playerRigidbody2D.velocity = m_playerSpeed * Time.fixedDeltaTime * direction.normalized;
     }
 }
