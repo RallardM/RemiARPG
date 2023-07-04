@@ -5,12 +5,6 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
-    public float m_enemySpeed = 500.0f;
-    public float m_checkRadius = 1.0f;
-    public float m_attackRadius = 1.0f;
-
-    public bool m_shouldRotate = true;
-
     private LayerMask m_playerLayerMask;
     private Transform m_playerTransform;
     private Transform m_enemyTransform;
@@ -18,10 +12,13 @@ public class EnemyAI : MonoBehaviour
     private Rigidbody2D m_enemyRigidbody2D;
     private Animator m_animator;
     private Vector2 m_movement;
-    public Vector3 m_direction;
-
+    private Vector3 m_direction;
+    private float m_enemySpeed = 300.0f;
+    private float m_checkRadius = 8.0f;
+    private float m_attackRadius = 2.0f;
     private bool m_isInChaseRange = false;
     private bool m_isInAttackRange = false;
+    //private bool m_isAttacking;
 
     private void Awake()
     {
@@ -35,7 +32,7 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
-        m_animator.SetBool("CanWalk", m_isInChaseRange);
+        m_animator.SetBool("IsEnemyWalking", m_isInChaseRange);
         
         m_isInChaseRange = Physics2D.OverlapCircle(transform.position, m_checkRadius, m_playerLayerMask);
         m_isInAttackRange = Physics2D.OverlapCircle(transform.position, m_attackRadius, m_playerLayerMask);
@@ -46,11 +43,22 @@ public class EnemyAI : MonoBehaviour
         m_direction.Normalize();
         m_movement = m_direction;
 
-        if(m_shouldRotate)
+        if (m_direction.x < 0)
         {
-            //transform.rotation = Quaternion.Euler(0.0f, 0.0f, angleToPlayer);
-            m_animator.SetFloat("X", m_movement.x);
-            m_animator.SetFloat("Y", m_movement.y);
+            GetComponent<SpriteRenderer>().flipX = true;
+        }
+        else
+        {
+            GetComponent<SpriteRenderer>().flipX = false;
+        }
+
+        // Source : https://docs.unity3d.com/ScriptReference/Animator.GetCurrentAnimatorStateInfo.html
+        if (m_isInAttackRange && !m_animator.GetBool("IsEnemyAttacking") && !m_animator.GetCurrentAnimatorStateInfo(0).IsName("Attacking"))
+        {
+            Debug.Log("Ennemy is attacking");
+            //m_isAttacking = true;
+            m_animator.SetBool("IsEnemyAttacking", true);
+            return;
         }
     }
 
@@ -58,21 +66,24 @@ public class EnemyAI : MonoBehaviour
     {
         if(m_isInChaseRange && !m_isInAttackRange)
         {
+            Debug.Log("Ennemy is chasing");
             MoveEnemy(m_movement);
+            return;
         }
-        else if (m_isInAttackRange)
-        {
-            //m_animator.SetTrigger("Attack");
-            m_enemyRigidbody2D.velocity = Vector2.zero;
-        }
-        else
-        {
-            m_animator.SetBool("CanWalk", false);
-        }
+
+        m_enemyRigidbody2D.velocity = Vector2.zero;
     }
 
-    private void MoveEnemy(Vector2 m_movement)
+    private void MoveEnemy(Vector2 movement)
     {
-        m_enemyRigidbody2D.MovePosition((Vector2)transform.position + (m_movement * m_enemySpeed * Time.deltaTime));
+        m_enemyRigidbody2D.velocity = movement * m_enemySpeed * Time.fixedDeltaTime;
+    }
+
+    public void OnEnemyAttackEnd()
+    {
+        Debug.Log("OnEnemyAttackEnd");
+        //m_isAttacking = false;
+        m_animator.SetBool("IsEnemyAttacking", false);
+        Debug.Log("IsEnemyAttacking: " + m_animator.GetBool("IsEnemyAttacking"));
     }
 }
