@@ -14,7 +14,7 @@ public class CharacterController : MonoBehaviour
         m_animator = GetComponent<Animator>();
         m_spriteRenderer = GetComponent<SpriteRenderer>();
         m_playerRigidbody2D = GetComponent<Rigidbody2D>();
-        m_playerSword = GetComponentInChildren<Transform>().Find("PlayerSword");
+        m_playerSword = GetComponentInChildren<Transform>().Find("SwordCollider");
     }
 
     // Start is called before the first frame update
