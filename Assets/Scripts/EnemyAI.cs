@@ -10,6 +10,7 @@ public class EnemyAI : MonoBehaviour
     private Transform m_enemyTransform;
     private Transform m_charactersTransfom;
     private Rigidbody2D m_enemyRigidbody2D;
+    private Transform m_enemySword;
     private Animator m_animator;
     private Vector2 m_movement;
     private Vector3 m_direction;
@@ -29,6 +30,7 @@ public class EnemyAI : MonoBehaviour
         m_charactersTransfom = m_enemyTransform.transform.parent;
         m_playerTransform = m_charactersTransfom.Find("Player");
         m_playerLayerMask = LayerMask.GetMask("Player");
+        m_enemySword = GetComponentInChildren<Transform>().Find("EnemySword");
     }
 
     private void Update()
@@ -47,17 +49,17 @@ public class EnemyAI : MonoBehaviour
         if (m_direction.x < 0)
         {
             GetComponent<SpriteRenderer>().flipX = true;
+            m_enemySword.localScale = new Vector3(transform.localScale.x * -0.1f, transform.localScale.y * 0.1f, transform.localScale.z * 0.1f);
         }
         else
         {
             GetComponent<SpriteRenderer>().flipX = false;
+            m_enemySword.localScale = new Vector3(transform.localScale.x * -0.1f, transform.localScale.y * 0.1f, transform.localScale.z * 0.1f);
         }
 
         // Source : https://docs.unity3d.com/ScriptReference/Animator.GetCurrentAnimatorStateInfo.html
         if (m_isInAttackRange && !m_animator.GetBool("IsEnemyAttacking") && !m_animator.GetCurrentAnimatorStateInfo(0).IsName("Attacking"))
         {
-            Debug.Log("Ennemy is attacking");
-            //m_isAttacking = true;
             m_animator.SetBool("IsEnemyAttacking", true);
             return;
         }
@@ -67,7 +69,6 @@ public class EnemyAI : MonoBehaviour
     {
         if(m_isInChaseRange && !m_isInAttackRange)
         {
-            Debug.Log("Ennemy is chasing");
             MoveEnemy(m_movement);
             return;
         }
@@ -82,9 +83,6 @@ public class EnemyAI : MonoBehaviour
 
     public void OnEnemyAttackEnd()
     {
-        Debug.Log("OnEnemyAttackEnd");
-        //m_isAttacking = false;
         m_animator.SetBool("IsEnemyAttacking", false);
-        Debug.Log("IsEnemyAttacking: " + m_animator.GetBool("IsEnemyAttacking"));
     }
 }

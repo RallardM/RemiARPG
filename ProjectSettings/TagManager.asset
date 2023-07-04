@@ -8,17 +8,17 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Player
+  - TestLayer
   - Water
   - UI
   - Walls
   - CameraBounds
   - Enemy
-  - 
-  - 
-  - 
-  - 
-  - 
+  - EnemySword
+  - EnemyHitBox
+  - Player
+  - PlayerSword
+  - PlayerHitBox
   - 
   - 
   - 
