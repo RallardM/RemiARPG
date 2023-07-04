@@ -23,6 +23,13 @@ public class CharacterController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKey(KeyCode.Mouse0))
+        {
+            m_animator.SetFloat("Speed", 0.0f);
+            m_animator.SetBool("IsAttacking", true);
+            return;
+        }
+
         if (Input.GetKey(KeyCode.W))
         {
             m_animator.SetFloat("Speed", 1.0f);
@@ -51,6 +58,12 @@ public class CharacterController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Keeps the animation from playing if the player is moving in two oposite directions
+        if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D))
+        {
+            return;
+        }
+
         Vector2 direction = Vector2.zero;
 
         if (Input.GetKey(KeyCode.W))
@@ -74,5 +87,10 @@ public class CharacterController : MonoBehaviour
         }
 
         m_playerRigidbody2D.velocity = m_playerSpeed * Time.fixedDeltaTime * direction.normalized;
+    }
+
+    public void OnAttackEnd()
+    {
+        m_animator.SetBool("IsAttacking", false);
     }
 }
