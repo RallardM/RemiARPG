@@ -1,4 +1,4 @@
-// Source : https://www.youtube.com/watch?v=2xaQYZW6LLA
+// Source : https://youtu.be/2xaQYZW6LLA
 
 using System;
 using UnityEngine;
@@ -14,7 +14,8 @@ public class EnemyAI : MonoBehaviour
     private Vector2 m_movement;
     private Vector3 m_direction;
     private float m_enemySpeed = 300.0f;
-    private float m_checkRadius = 8.0f;
+    private float m_enemyHealth = 100.0f;
+    private float m_checkRadius = 9.0f;
     private float m_attackRadius = 2.0f;
     private bool m_isInChaseRange = false;
     private bool m_isInAttackRange = false;

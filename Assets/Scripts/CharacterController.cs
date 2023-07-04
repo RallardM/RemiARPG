@@ -5,13 +5,16 @@ public class CharacterController : MonoBehaviour
     private Animator m_animator;
     private SpriteRenderer m_spriteRenderer;
     private Rigidbody2D m_playerRigidbody2D;
+    private Transform m_playerSword;
     private float m_playerSpeed = 500.0f;
+    private float m_playerHealth = 100.0f;
 
     private void Awake()
     {
         m_animator = GetComponent<Animator>();
         m_spriteRenderer = GetComponent<SpriteRenderer>();
         m_playerRigidbody2D = GetComponent<Rigidbody2D>();
+        m_playerSword = GetComponentInChildren<Transform>().Find("PlayerSword");
     }
 
     // Start is called before the first frame update
@@ -43,12 +46,15 @@ public class CharacterController : MonoBehaviour
         if (Input.GetKey(KeyCode.A))
         {
             m_spriteRenderer.flipX = true;
+            // Source : https://www.youtube.com/watch?v=BvIC5KMjBVE
+            m_playerSword.localScale = new Vector3(transform.localScale.x * -0.1f, transform.localScale.y * 0.1f, transform.localScale.z * 0.1f);
             m_animator.SetFloat("Speed", 1.0f);
             return;
         }
         if (Input.GetKey(KeyCode.D))
         {
             m_spriteRenderer.flipX = false;
+            m_playerSword.localScale = new Vector3(transform.localScale.x * 0.1f, transform.localScale.y * 0.1f, transform.localScale.z * 0.1f);
             m_animator.SetFloat("Speed", 1.0f);
             return;
         }
