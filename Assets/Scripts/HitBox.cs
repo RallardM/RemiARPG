@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class HitBox : MonoBehaviour
@@ -5,12 +6,15 @@ public class HitBox : MonoBehaviour
     LayerMask m_selfLayerMask;
     Transform m_characterTransform;
     Rigidbody2D m_hitBoxRigidbody;
+    Animator m_chatacterAnimator;
+    private float m_health = 100.0f;
 
     private void Awake()
     {
         m_selfLayerMask = gameObject.layer;
         m_characterTransform = transform.parent;
         m_hitBoxRigidbody = GetComponent<Rigidbody2D>();
+        m_chatacterAnimator = transform.parent.GetComponent<Animator>();
     }
 
     private void FixedUpdate()
@@ -21,18 +25,20 @@ public class HitBox : MonoBehaviour
         m_hitBoxRigidbody.MovePosition(movement);
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void Update()
     {
-        Debug.Log("OnTriggerEnter name : " + other.name);
+        if (this.m_health <= 0.0f)
+        {
+            m_chatacterAnimator.SetBool("IsDying", true);
+        }
     }
 
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("OnTriggerStay name : " + other.name);
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("OnCollisionEnter name : " + collision.gameObject.name);
+        if (other.gameObject.layer != m_selfLayerMask)
+        {
+            Debug.Log("Self name : " + gameObject.name);
+            other.gameObject.GetComponent<HitBox>().m_health -= 10.0f;
+        }
     }
 }

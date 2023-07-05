@@ -1,13 +1,12 @@
 using UnityEngine;
 
-public class CharacterController : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     private Animator m_animator;
     private SpriteRenderer m_spriteRenderer;
     private Rigidbody2D m_playerRigidbody2D;
     private Transform m_playerSword;
     private float m_playerSpeed = 500.0f;
-    private float m_playerHealth = 100.0f;
 
     private void Awake()
     {

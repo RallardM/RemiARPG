@@ -14,13 +14,11 @@ public class EnemyAI : MonoBehaviour
     private Animator m_animator;
     private Vector2 m_movement;
     private Vector3 m_direction;
-    private float m_enemySpeed = 300.0f;
-    private float m_enemyHealth = 100.0f;
-    private float m_checkRadius = 9.0f;
-    private float m_attackRadius = 2.0f;
+    private readonly float m_enemySpeed = 300.0f;
+    private readonly float m_checkRadius = 9.0f;
+    private readonly float m_attackRadius = 2.0f;
     private bool m_isInChaseRange = false;
     private bool m_isInAttackRange = false;
-    //private bool m_isAttacking;
 
     private void Awake()
     {
@@ -35,7 +33,7 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
-        m_animator.SetBool("IsEnemyWalking", m_isInChaseRange);
+        m_animator.SetBool("IsWalking", m_isInChaseRange);
         
         m_isInChaseRange = Physics2D.OverlapCircle(transform.position, m_checkRadius, m_playerLayerMask);
         m_isInAttackRange = Physics2D.OverlapCircle(transform.position, m_attackRadius, m_playerLayerMask);
@@ -46,28 +44,28 @@ public class EnemyAI : MonoBehaviour
         m_direction.Normalize();
         m_movement = m_direction;
 
-        if (m_direction.x < 0)
+        if (m_direction.x < 0 && !m_animator.GetBool("IsDying"))
         {
             GetComponent<SpriteRenderer>().flipX = true;
             m_enemySword.localScale = new Vector3(transform.localScale.x * -0.1f, transform.localScale.y * 0.1f, transform.localScale.z * 0.1f);
         }
-        else
+        else if (m_direction.x > 0 && !m_animator.GetBool("IsDying"))
         {
             GetComponent<SpriteRenderer>().flipX = false;
             m_enemySword.localScale = new Vector3(transform.localScale.x * -0.1f, transform.localScale.y * 0.1f, transform.localScale.z * 0.1f);
         }
 
         // Source : https://docs.unity3d.com/ScriptReference/Animator.GetCurrentAnimatorStateInfo.html
-        if (m_isInAttackRange && !m_animator.GetBool("IsEnemyAttacking") && !m_animator.GetCurrentAnimatorStateInfo(0).IsName("Attacking"))
+        if (m_isInAttackRange && !m_animator.GetBool("IsAttacking") && !m_animator.GetCurrentAnimatorStateInfo(0).IsName("Attacking"))
         {
-            m_animator.SetBool("IsEnemyAttacking", true);
+            m_animator.SetBool("IsAttacking", true);
             return;
         }
     }
 
     private void FixedUpdate()
     {
-        if(m_isInChaseRange && !m_isInAttackRange)
+        if(m_isInChaseRange && !m_isInAttackRange && !m_animator.GetBool("IsDying"))
         {
             MoveEnemy(m_movement);
             return;
@@ -83,6 +81,6 @@ public class EnemyAI : MonoBehaviour
 
     public void OnEnemyAttackEnd()
     {
-        m_animator.SetBool("IsEnemyAttacking", false);
+        m_animator.SetBool("IsAttacking", false);
     }
 }
