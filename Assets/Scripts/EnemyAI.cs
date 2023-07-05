@@ -93,9 +93,7 @@ public class EnemyAI : MonoBehaviour
             return;
         }
   
-        //m_enemyRigidbody2D.velocity = Vector2.zero;
-        //m_animator.SetFloat("Speed", 0.0f);
-        
+        m_enemyRigidbody2D.velocity = Vector2.zero;
     }
 
     public void OnEnemyAttackEnd()

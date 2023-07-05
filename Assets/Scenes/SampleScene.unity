@@ -1780,7 +1780,7 @@ GameObject:
   - component: {fileID: 1974106657}
   - component: {fileID: 1974106658}
   - component: {fileID: 1974106659}
-  m_Layer: 13
+  m_Layer: 10
   m_Name: EnemyHitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2118,7 +2118,7 @@ Animator:
   m_GameObject: {fileID: 2120796291}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 36b6b555e799d934abbd767fbc9c4e45, type: 2}
+  m_Controller: {fileID: 9100000, guid: fccaacf44691665438b61fe03050fd76, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
