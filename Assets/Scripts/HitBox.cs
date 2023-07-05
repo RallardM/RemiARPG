@@ -9,6 +9,8 @@ public class HitBox : MonoBehaviour
     Animator m_chatacterAnimator;
     private float m_health = 100.0f;
 
+    public float GetHealth { get{return m_health;} }
+
     private void Awake()
     {
         m_selfLayerMask = gameObject.layer;

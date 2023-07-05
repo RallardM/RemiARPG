@@ -10,7 +10,9 @@ public class EnemyAI : MonoBehaviour
     private Transform m_charactersTransfom;
     private Rigidbody2D m_enemyRigidbody2D;
     private Transform m_enemySword;
-    private Animator m_animator;
+    private Animator m_enemyAnimator;
+    private Animator m_playerAnimator;
+
     private Vector2 m_movement;
     private Vector3 m_direction;
     private readonly float m_enemySpeed = 300.0f;
@@ -22,18 +24,26 @@ public class EnemyAI : MonoBehaviour
     private void Awake()
     {
         m_enemyRigidbody2D = GetComponent<Rigidbody2D>();
-        m_animator = GetComponent<Animator>();
+        m_enemyAnimator = GetComponent<Animator>();
         m_enemyTransform = transform;
         m_charactersTransfom = m_enemyTransform.transform.parent;
         m_playerTransform = m_charactersTransfom.Find("Player");
+        m_playerAnimator = m_playerTransform.GetComponent<Animator>();
         m_playerLayerMask = LayerMask.GetMask("Player");
         m_enemySword = GetComponentInChildren<Transform>().Find("EnemySword");
     }
 
     private void Update()
     {
-        if (m_animator.GetBool("IsDying") == true)
+        if (m_enemyAnimator.GetBool("IsDying") == true)
         {
+            m_enemyRigidbody2D.velocity = Vector2.zero;
+            return;
+        }
+
+        if (m_playerAnimator.GetCurrentAnimatorStateInfo(0).IsName("Dying"))
+        {
+            m_enemyAnimator.SetBool("IsWalking", false);
             return;
         }
 
@@ -42,7 +52,7 @@ public class EnemyAI : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (m_animator.GetBool("IsDying"))
+        if (m_enemyAnimator.GetBool("IsDying") || m_playerAnimator.GetCurrentAnimatorStateInfo(0).IsName("Dying"))
         {
             m_enemyRigidbody2D.velocity = Vector2.zero;
             return;
@@ -53,7 +63,7 @@ public class EnemyAI : MonoBehaviour
 
     private void AnimEnemy()
     {
-        m_animator.SetBool("IsWalking", m_isInChaseRange);
+        m_enemyAnimator.SetBool("IsWalking", m_isInChaseRange);
 
         m_isInChaseRange = Physics2D.OverlapCircle(transform.position, m_checkRadius, m_playerLayerMask);
         m_isInAttackRange = Physics2D.OverlapCircle(transform.position, m_attackRadius, m_playerLayerMask);
@@ -64,23 +74,23 @@ public class EnemyAI : MonoBehaviour
         m_direction.Normalize();
         m_movement = m_direction;
 
-        if (m_direction.x < 0 && !m_animator.GetBool("IsDying"))
+        if (m_direction.x < 0 && !m_enemyAnimator.GetBool("IsDying"))
         {
             GetComponent<SpriteRenderer>().flipX = true;
             m_enemySword.localScale = new Vector3(transform.localScale.x * -0.1f, transform.localScale.y * 0.1f, transform.localScale.z * 0.1f);
         }
-        else if (m_direction.x > 0 && !m_animator.GetBool("IsDying"))
+        else if (m_direction.x > 0 && !m_enemyAnimator.GetBool("IsDying"))
         {
             GetComponent<SpriteRenderer>().flipX = false;
             m_enemySword.localScale = new Vector3(transform.localScale.x * 0.1f, transform.localScale.y * 0.1f, transform.localScale.z * 0.1f);
         }
 
         // Source : https://docs.unity3d.com/ScriptReference/Animator.GetCurrentAnimatorStateInfo.html
-        if (m_isInAttackRange && !m_animator.GetBool("IsAttacking") && !m_animator.GetCurrentAnimatorStateInfo(0).IsName("Attacking"))
+        if (m_isInAttackRange && !m_enemyAnimator.GetBool("IsAttacking") && !m_enemyAnimator.GetCurrentAnimatorStateInfo(0).IsName("Attacking"))
         {
             Debug.Log("IsAttacking");
-            m_animator.SetBool("IsWalking", false);
-            m_animator.SetBool("IsAttacking", true);
+            m_enemyAnimator.SetBool("IsWalking", false);
+            m_enemyAnimator.SetBool("IsAttacking", true);
             return;
         }
     }
@@ -98,11 +108,11 @@ public class EnemyAI : MonoBehaviour
 
     public void OnEnemyAttackEnd()
     {
-        m_animator.SetBool("IsAttacking", false);
+        m_enemyAnimator.SetBool("IsAttacking", false);
     }
 
     public void OnEndOfDamageAnim()
     {
-        m_animator.SetBool("IsReceivingDamage", false);
+        m_enemyAnimator.SetBool("IsReceivingDamage", false);
     }
 }
