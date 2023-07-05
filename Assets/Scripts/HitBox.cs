@@ -51,7 +51,7 @@ public class HitBox : MonoBehaviour
             return;
         }
 
-        if (m_characterGameObject != other.gameObject.transform.parent.parent.gameObject)
+        if (m_characterGameObject != other.gameObject.transform.parent.parent.gameObject && other.gameObject.transform.parent.parent.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Attacking"))
         {
             m_chatacterAnimator.SetBool("IsReceivingDamage", false);
             m_chatacterAnimator.Rebind();

@@ -90,7 +90,6 @@ public class EnemyAI : MonoBehaviour
         if (m_isInChaseRange && !m_isInAttackRange)
         {
             m_enemyRigidbody2D.velocity = m_enemySpeed * Time.fixedDeltaTime * m_movement;
-            m_animator.SetFloat("Speed", 1.0f);
             return;
         }
   
