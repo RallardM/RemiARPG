@@ -26,7 +26,7 @@ public class CharacterController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.Mouse0))
+        if (Input.GetKey(KeyCode.Mouse0) && !m_animator.GetCurrentAnimatorStateInfo(0).IsName("Attacking"))
         {
             m_animator.SetFloat("Speed", 0.0f);
             m_animator.SetBool("IsAttacking", true);
