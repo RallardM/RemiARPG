@@ -1,10 +1,10 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class HitBox : MonoBehaviour
 {
     LayerMask m_selfLayerMask;
     Transform m_characterTransform;
+    GameObject m_characterGameObject;
     Rigidbody2D m_hitBoxRigidbody;
     Animator m_chatacterAnimator;
     private float m_health = 100.0f;
@@ -13,12 +13,18 @@ public class HitBox : MonoBehaviour
     {
         m_selfLayerMask = gameObject.layer;
         m_characterTransform = transform.parent;
+        m_characterGameObject = transform.parent.gameObject;
         m_hitBoxRigidbody = GetComponent<Rigidbody2D>();
         m_chatacterAnimator = transform.parent.GetComponent<Animator>();
     }
 
     private void FixedUpdate()
     {
+        if (m_chatacterAnimator.GetBool("IsDying"))
+        {
+            return;
+        }
+
         float horizontal = m_characterTransform.localPosition.x;
         float vertical = m_characterTransform.localPosition.y;
         Vector2 movement = new(horizontal, vertical);
@@ -27,6 +33,11 @@ public class HitBox : MonoBehaviour
 
     private void Update()
     {
+        if (m_chatacterAnimator.GetBool("IsDying"))
+        {
+            return;
+        }
+
         if (this.m_health <= 0.0f)
         {
             m_chatacterAnimator.SetBool("IsDying", true);
@@ -35,10 +46,17 @@ public class HitBox : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.layer != m_selfLayerMask)
+        if(m_chatacterAnimator.GetBool("IsDying"))
         {
-            Debug.Log("Self name : " + gameObject.name);
-            other.gameObject.GetComponent<HitBox>().m_health -= 10.0f;
+            return;
+        }
+
+        if (m_characterGameObject != other.gameObject.transform.parent.parent.gameObject)
+        {
+            m_chatacterAnimator.SetBool("IsReceivingDamage", false);
+            m_chatacterAnimator.Rebind();
+            m_health -= 10.0f;
+            m_chatacterAnimator.SetBool("IsReceivingDamage", true);
         }
     }
 }

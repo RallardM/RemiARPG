@@ -16,14 +16,30 @@ public class PlayerController : MonoBehaviour
         m_playerSword = GetComponentInChildren<Transform>().Find("PlayerSword");
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        m_animator.SetBool("CanWalk", true);
-    }
-
     // Update is called once per frame
     void Update()
+    {
+        if (m_animator.GetBool("IsDying"))
+        {
+            m_animator.SetFloat("Speed", 0.0f);
+            return;
+        }
+
+        AnimPlayer();
+    }
+
+    private void FixedUpdate()
+    {
+        if (m_animator.GetBool("IsDying"))
+        {
+            m_playerRigidbody2D.velocity = Vector2.zero;
+            return;
+        }
+        
+        MovePlayer();
+    }
+
+    private void AnimPlayer()
     {
         if (Input.GetKey(KeyCode.Mouse0) && !m_animator.GetCurrentAnimatorStateInfo(0).IsName("Attacking"))
         {
@@ -61,7 +77,7 @@ public class PlayerController : MonoBehaviour
         m_animator.SetFloat("Speed", 0.0f);
     }
 
-    private void FixedUpdate()
+    private void MovePlayer()
     {
         // Keeps the animation from playing if the player is moving in two oposite directions
         if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D))
@@ -97,5 +113,10 @@ public class PlayerController : MonoBehaviour
     public void OnAttackEnd()
     {
         m_animator.SetBool("IsAttacking", false);
+    }
+
+    public void OnEndOfDamageAnim()
+    {
+        m_animator.SetBool("IsReceivingDamage", false);
     }
 }

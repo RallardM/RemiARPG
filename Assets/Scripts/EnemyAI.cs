@@ -1,6 +1,5 @@
 // Source : https://youtu.be/2xaQYZW6LLA
 
-using System;
 using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
@@ -33,8 +32,29 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
+        if (m_animator.GetBool("IsDying") == true)
+        {
+            return;
+        }
+
+        AnimEnemy();
+    }
+
+    private void FixedUpdate()
+    {
+        if (m_animator.GetBool("IsDying"))
+        {
+            m_enemyRigidbody2D.velocity = Vector2.zero;
+            return;
+        }
+
+        MoveEnemy();
+    }
+
+    private void AnimEnemy()
+    {
         m_animator.SetBool("IsWalking", m_isInChaseRange);
-        
+
         m_isInChaseRange = Physics2D.OverlapCircle(transform.position, m_checkRadius, m_playerLayerMask);
         m_isInAttackRange = Physics2D.OverlapCircle(transform.position, m_attackRadius, m_playerLayerMask);
 
@@ -52,35 +72,40 @@ public class EnemyAI : MonoBehaviour
         else if (m_direction.x > 0 && !m_animator.GetBool("IsDying"))
         {
             GetComponent<SpriteRenderer>().flipX = false;
-            m_enemySword.localScale = new Vector3(transform.localScale.x * -0.1f, transform.localScale.y * 0.1f, transform.localScale.z * 0.1f);
+            m_enemySword.localScale = new Vector3(transform.localScale.x * 0.1f, transform.localScale.y * 0.1f, transform.localScale.z * 0.1f);
         }
 
         // Source : https://docs.unity3d.com/ScriptReference/Animator.GetCurrentAnimatorStateInfo.html
         if (m_isInAttackRange && !m_animator.GetBool("IsAttacking") && !m_animator.GetCurrentAnimatorStateInfo(0).IsName("Attacking"))
         {
+            Debug.Log("IsAttacking");
+            m_animator.SetBool("IsWalking", false);
             m_animator.SetBool("IsAttacking", true);
             return;
         }
     }
 
-    private void FixedUpdate()
+    private void MoveEnemy()
     {
-        if(m_isInChaseRange && !m_isInAttackRange && !m_animator.GetBool("IsDying"))
+        if (m_isInChaseRange && !m_isInAttackRange)
         {
-            MoveEnemy(m_movement);
+            m_enemyRigidbody2D.velocity = m_enemySpeed * Time.fixedDeltaTime * m_movement;
+            m_animator.SetFloat("Speed", 1.0f);
             return;
         }
-
-        m_enemyRigidbody2D.velocity = Vector2.zero;
-    }
-
-    private void MoveEnemy(Vector2 movement)
-    {
-        m_enemyRigidbody2D.velocity = movement * m_enemySpeed * Time.fixedDeltaTime;
+  
+        //m_enemyRigidbody2D.velocity = Vector2.zero;
+        //m_animator.SetFloat("Speed", 0.0f);
+        
     }
 
     public void OnEnemyAttackEnd()
     {
         m_animator.SetBool("IsAttacking", false);
+    }
+
+    public void OnEndOfDamageAnim()
+    {
+        m_animator.SetBool("IsReceivingDamage", false);
     }
 }
