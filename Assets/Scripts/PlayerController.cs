@@ -1,12 +1,24 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private TrailRenderer m_trailRenderer;
     private Animator m_animator;
     private SpriteRenderer m_spriteRenderer;
     private Rigidbody2D m_playerRigidbody2D;
     private Transform m_playerSword;
+
+    private Vector2 m_movement = Vector2.zero;
+
     private float m_playerSpeed = 500.0f;
+    private float m_dashingPower = 6.0f;
+    private float m_dashingTime = 0.4f;
+    private float m_dashingCooldown = 1.0f;
+
+    private bool m_canDash = true;
+    private bool m_isDashing = false;
+   
 
     private void Awake()
     {
@@ -14,11 +26,17 @@ public class PlayerController : MonoBehaviour
         m_spriteRenderer = GetComponent<SpriteRenderer>();
         m_playerRigidbody2D = GetComponent<Rigidbody2D>();
         m_playerSword = GetComponentInChildren<Transform>().Find("PlayerSword");
+        m_trailRenderer= GetComponentInChildren<TrailRenderer>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(m_isDashing)
+        {
+            return;
+        }
+
         if (m_animator.GetBool("IsDying"))
         {
             m_animator.SetFloat("Speed", 0.0f);
@@ -30,6 +48,11 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (m_isDashing)
+        {
+            return;
+        }
+
         if (m_animator.GetBool("IsDying"))
         {
             m_playerRigidbody2D.velocity = Vector2.zero;
@@ -46,6 +69,11 @@ public class PlayerController : MonoBehaviour
             m_animator.SetFloat("Speed", 0.0f);
             m_animator.SetBool("IsAttacking", true);
             return;
+        }
+
+        if (Input.GetKey(KeyCode.Space) && m_canDash)
+        {
+            StartCoroutine(Dash());
         }
 
         if (Input.GetKey(KeyCode.W))
@@ -85,29 +113,43 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        Vector2 direction = Vector2.zero;
+        m_movement = Vector2.zero;
 
         if (Input.GetKey(KeyCode.W))
         {
-            direction += new Vector2(0.0f, 1.0f);
+            m_movement += new Vector2(0.0f, 1.0f);
         }
 
         if (Input.GetKey(KeyCode.S))
         {
-            direction += new Vector2(0.0f, -1.0f);
+            m_movement += new Vector2(0.0f, -1.0f);
         }
 
         if (Input.GetKey(KeyCode.A))
         {
-            direction += new Vector2(-1.0f, 0.0f);
+            m_movement += new Vector2(-1.0f, 0.0f);
         }
 
         if (Input.GetKey(KeyCode.D))
         {
-            direction += new Vector2(1.0f, 0.0f);
+            m_movement += new Vector2(1.0f, 0.0f);
         }
 
-        m_playerRigidbody2D.velocity = m_playerSpeed * Time.fixedDeltaTime * direction.normalized;
+        m_playerRigidbody2D.velocity = m_playerSpeed * Time.fixedDeltaTime * m_movement.normalized;
+    }
+
+    // Source : https://www.youtube.com/watch?v=0v_H3oOR0aU
+    private IEnumerator Dash()
+    {
+        m_canDash = false;
+        m_isDashing = true;
+        m_playerRigidbody2D.velocity = new Vector2(transform.localScale.x * m_movement.x, transform.localScale.y * m_movement.y) * m_dashingPower;
+        m_trailRenderer.emitting = true;
+        yield return new WaitForSeconds(m_dashingTime);
+        m_trailRenderer.emitting = false;
+        m_isDashing = false;
+        yield return new WaitForSeconds(m_dashingCooldown);
+        m_canDash = true;
     }
 
     public void OnAttackEnd()
