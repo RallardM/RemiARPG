@@ -35,12 +35,14 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
+        // Keeps the enemy from moving once he's dead.
         if (m_enemyAnimator.GetBool("IsDying") == true)
         {
             m_enemyRigidbody2D.velocity = Vector2.zero;
             return;
         }
 
+        // Keeps the enemy from playing his walking animation when the player is dead.
         if (m_playerAnimator.GetCurrentAnimatorStateInfo(0).IsName("Dying"))
         {
             m_enemyAnimator.SetBool("IsWalking", false);
@@ -52,6 +54,7 @@ public class EnemyAI : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Keeps the enemy from moving when the state of the player player is IsDying.
         if (m_enemyAnimator.GetBool("IsDying") || m_playerAnimator.GetCurrentAnimatorStateInfo(0).IsName("Dying"))
         {
             m_enemyRigidbody2D.velocity = Vector2.zero;
@@ -63,14 +66,16 @@ public class EnemyAI : MonoBehaviour
 
     private void AnimEnemy()
     {
+        // Makes the enemy play his walking animation when the player is in his chase range.
         m_enemyAnimator.SetBool("IsWalking", m_isInChaseRange);
 
+        // Source : https://youtu.be/2xaQYZW6LLA
+        // Sets the ranges that activate the combat states.
         m_isInChaseRange = Physics2D.OverlapCircle(transform.position, m_checkRadius, m_playerLayerMask);
         m_isInAttackRange = Physics2D.OverlapCircle(transform.position, m_attackRadius, m_playerLayerMask);
 
+        // Sets the enemy direction towards the player.
         m_direction = m_playerTransform.position - transform.position;
-
-        float angleToPlayer = Mathf.Atan2(m_direction.y, m_direction.x) * Mathf.Rad2Deg;
         m_direction.Normalize();
         m_movement = m_direction;
 

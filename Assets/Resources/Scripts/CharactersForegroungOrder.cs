@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+// Reorders the characters' layer based on their Y position so that the closest character to the camera is in front of the other one.
+
 using UnityEngine;
 
 public class CharactersForegroungOrder : MonoBehaviour
@@ -13,7 +13,6 @@ public class CharactersForegroungOrder : MonoBehaviour
         m_enemySpriteRenderer = GameObject.Find("Enemy").GetComponent<SpriteRenderer>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (m_playerSpriteRenderer.transform.position.y > m_enemySpriteRenderer.transform.position.y)
@@ -26,6 +25,5 @@ public class CharactersForegroungOrder : MonoBehaviour
             m_playerSpriteRenderer.sortingOrder = 2;
             m_enemySpriteRenderer.sortingOrder = 1;
         }
-        
     }
 }
