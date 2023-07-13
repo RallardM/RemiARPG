@@ -172,6 +172,7 @@ public class PlayerController : MonoBehaviour
         }
 
         m_playerRigidbody2D.velocity = m_playerSpeed * Time.fixedDeltaTime * m_movement.normalized;
+        Debug.Log("Velocity : " + m_playerRigidbody2D.velocity);
     }
 
     // Source : https://www.youtube.com/watch?v=0v_H3oOR0aU
