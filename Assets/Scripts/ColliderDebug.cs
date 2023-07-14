@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+// Draws a line around the collider of the object no matter what is currently selected in the hierachy.
+
 using UnityEngine;
 
 public class ColliderDebug : MonoBehaviour
