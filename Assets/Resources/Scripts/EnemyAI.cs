@@ -13,6 +13,7 @@ public class EnemyAI : MonoBehaviour
     private Transform m_enemyHitBox;
     private Animator m_enemyAnimator;
     private Animator m_playerAnimator;
+    private SpriteRenderer m_enemySpriteRenderer;
 
     private Vector2 m_movement;
     private Vector3 m_direction;
@@ -27,18 +28,33 @@ public class EnemyAI : MonoBehaviour
     private void Awake()
     {
         m_enemyRigidbody2D = GetComponent<Rigidbody2D>();
-        m_enemyAnimator = GetComponent<Animator>();
+        Transform enemySprite = GetComponentInChildren<Transform>().Find("Sprite");
+        m_enemySpriteRenderer = enemySprite.GetComponent<SpriteRenderer>();
+        m_enemyAnimator = enemySprite.GetComponent<Animator>();
         m_enemyTransform = transform;
         m_charactersTransfom = m_enemyTransform.transform.parent;
         m_playerTransform = m_charactersTransfom.Find("Player");
-        m_playerAnimator = m_playerTransform.GetComponent<Animator>();
+        Transform playerSprite = m_playerTransform.GetComponentInChildren<Transform>().Find("Sprite");
+        m_playerAnimator = playerSprite.GetComponent<Animator>();
         m_playerLayerMask = LayerMask.GetMask("Player");
-        m_enemySword = GetComponentInChildren<Transform>().Find("EnemySword");
+        m_enemySword = GetComponentInChildren<Transform>().Find("Sprite/EnemySword");
         m_enemyHitBox = m_enemyTransform.GetComponentInChildren<Transform>().Find("EnemyHitBox");
     }
 
     private void Update()
     {
+        // Returns if the player gameobject is destroyed
+        if (!m_playerAnimator)
+        {
+            return;
+        }
+
+        // Returns if the enemy gameobject is destroyed
+        if (!m_enemyAnimator)
+        {
+            return;
+        }
+
         // Keeps the enemy from moving once he's dead.
         if (m_enemyAnimator.GetBool("IsDying") == true)
         {
@@ -58,6 +74,18 @@ public class EnemyAI : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Returns if the player gameobject is destroyed
+        if (!m_playerAnimator)
+        {
+            return;
+        }
+
+        // Returns if the enemy gameobject is destroyed
+        if (!m_enemyAnimator)
+        {
+            return;
+        }
+
         // Keeps the enemy from moving when the state of the player player is IsDying.
         if (m_enemyAnimator.GetBool("IsDying") || m_playerAnimator.GetCurrentAnimatorStateInfo(0).IsName("Dying"))
         {
@@ -99,13 +127,13 @@ public class EnemyAI : MonoBehaviour
         // Conditions that flip the enemy sprite, second castShadow in hitbox and sword collider depending on the direction he's facing.
         if (m_direction.x < 0 && !m_enemyAnimator.GetBool("IsDying"))
         {
-            GetComponent<SpriteRenderer>().flipX = true;
+            m_enemySpriteRenderer.flipX = true;
             m_enemySword.localScale = new Vector3(transform.localScale.x * m_invertVector3X.x, transform.localScale.y * m_invertVector3X.y, transform.localScale.z * m_invertVector3X.z);
             m_enemyHitBox.localScale = new Vector3(transform.localScale.x * m_invertVector3X.x, transform.localScale.y * m_invertVector3X.y, transform.localScale.z * m_invertVector3X.z);
         }
         else if (m_direction.x > 0 && !m_enemyAnimator.GetBool("IsDying"))
         {
-            GetComponent<SpriteRenderer>().flipX = false;
+            m_enemySpriteRenderer.flipX = false;
             m_enemySword.localScale = new Vector3(transform.localScale.x * m_revertVector3X.x, transform.localScale.y * m_revertVector3X.y, transform.localScale.z * m_revertVector3X.z);
             m_enemyHitBox.localScale = new Vector3(transform.localScale.x * m_revertVector3X.x, transform.localScale.y * m_revertVector3X.y, transform.localScale.z * m_revertVector3X.z);
         }
@@ -138,17 +166,5 @@ public class EnemyAI : MonoBehaviour
         }
   
         m_enemyRigidbody2D.velocity = Vector2.zero;
-    }
-
-    // Event triggered at the end of the enemy's attack animation.
-    public void OnEnemyAttackEnd()
-    {
-        m_enemyAnimator.SetBool("IsAttacking", false);
-    }
-
-    // Event triggered at the end of the enemy's receiving damage animation.
-    public void OnEndOfDamageAnim()
-    {
-        m_enemyAnimator.SetBool("IsReceivingDamage", false);
     }
 }

@@ -24,74 +24,103 @@ public class AssetsLayerController : MonoBehaviour
     {
         GameObject charactersGameObject = GameObject.Find("Characters");
         GameObject tilemapsGameObject = GameObject.Find("Tilemaps");
-        m_playerSpriteRenderer = charactersGameObject.transform.Find("Player").GetComponent<SpriteRenderer>();
-        m_enemySpriteRenderer = charactersGameObject.transform.Find("Enemy").GetComponent<SpriteRenderer>();
+        Transform player = charactersGameObject.transform.Find("Player");
+        Transform playerSprite = player.transform.Find("Sprite");
+        m_playerSpriteRenderer = playerSprite.GetComponent<SpriteRenderer>();
+        Transform enemy = charactersGameObject.transform.Find("Enemy");
+        Transform enemySprite = enemy.transform.Find("Sprite");
+        m_enemySpriteRenderer = enemySprite.GetComponent<SpriteRenderer>();
         m_topLeftColumn = tilemapsGameObject.transform.Find("TopLeftColumn").GetComponent<Transform>();
         m_bottomLeftColumn = tilemapsGameObject.transform.Find("BottomLeftColumn").GetComponent<Transform>();
     }
 
     void Update()
     {
-        
+        if (!m_playerSpriteRenderer)
+        {
+            return;
+        }
+
+        if (!m_enemySpriteRenderer)
+        {
+            ReorderPlayer();
+            return;
+        }
+
+        ReorderBothCharacters();
+    }
+
+    private void ReorderPlayer()
+    {
+        if (m_playerSpriteRenderer.transform.position.y > m_topLeftColumn.transform.position.y)
+        {
+            m_playerSpriteRenderer.sortingOrder = m_firstLayer;
+            return;
+        }
+
+        if (m_playerSpriteRenderer.transform.position.y > m_bottomLeftColumn.transform.position.y)
+        {
+            m_playerSpriteRenderer.sortingOrder = m_firstLayer + m_betweenColumns;
+            return;
+        }
+
+        if (m_playerSpriteRenderer.transform.position.y < m_bottomLeftColumn.transform.position.y)
+        {
+            m_playerSpriteRenderer.sortingOrder = m_firstLayer + m_belowAllColumns;
+            return;
+        }
+
+        if (m_playerSpriteRenderer.transform.position.y < m_topLeftColumn.transform.position.y)
+        {
+            m_playerSpriteRenderer.sortingOrder = m_firstLayer + m_betweenColumns;
+            return;
+        }
+
+        m_playerSpriteRenderer.sortingOrder = m_firstLayer + m_betweenColumns;
+    }
+
+    private void ReorderBothCharacters()
+    {
         if (m_playerSpriteRenderer.transform.position.y > m_topLeftColumn.transform.position.y && m_enemySpriteRenderer.transform.position.y > m_topLeftColumn.transform.position.y)
         {
-            ReorderCharacters2(m_aboveAllColumns, m_bothCharactersOnSameLevel);
+            ReorderCharacters(m_aboveAllColumns, m_bothCharactersOnSameLevel);
             return;
         }
 
         if (m_playerSpriteRenderer.transform.position.y > m_topLeftColumn.transform.position.y && m_enemySpriteRenderer.transform.position.y < m_topLeftColumn.transform.position.y)
         {
-            ReorderCharacters2(m_aboveAllColumns, m_exceptThisCharacter);
+            ReorderCharacters(m_aboveAllColumns, m_exceptThisCharacter);
             return;
         }
 
         if (m_playerSpriteRenderer.transform.position.y < m_topLeftColumn.transform.position.y && m_enemySpriteRenderer.transform.position.y > m_topLeftColumn.transform.position.y)
         {
-            ReorderCharacters2(m_aboveAllColumns, m_exceptThisCharacter);
+            ReorderCharacters(m_aboveAllColumns, m_exceptThisCharacter);
             return;
         }
 
         if (m_playerSpriteRenderer.transform.position.y > m_bottomLeftColumn.transform.position.y && m_enemySpriteRenderer.transform.position.y > m_bottomLeftColumn.transform.position.y)
         {
-            ReorderCharacters2(m_betweenColumns, m_bothCharactersOnSameLevel);
+            ReorderCharacters(m_betweenColumns, m_bothCharactersOnSameLevel);
             return;
         }
 
         if (m_playerSpriteRenderer.transform.position.y > m_bottomLeftColumn.transform.position.y && m_enemySpriteRenderer.transform.position.y < m_bottomLeftColumn.transform.position.y)
         {
-            ReorderCharacters2(m_betweenColumns, m_exceptThisCharacter);
+            ReorderCharacters(m_betweenColumns, m_exceptThisCharacter);
             return;
         }
 
-        var playerPosition = m_playerSpriteRenderer.transform.position.y;
-        var enemyPosition = m_enemySpriteRenderer.transform.position.y;
-        var leftColumnPosition = m_bottomLeftColumn.transform.position.y;
-        bool playerIsNotAboveLeftColumn = playerPosition !>= leftColumnPosition;
-        bool enemyIsNotAboveLeftColumn = enemyPosition !>= leftColumnPosition;
         if (m_playerSpriteRenderer.transform.position.y < m_bottomLeftColumn.transform.position.y && m_enemySpriteRenderer.transform.position.y > m_bottomLeftColumn.transform.position.y)
         {
-            ReorderCharacters2(m_betweenColumns, m_exceptThisCharacter);
+            ReorderCharacters(m_betweenColumns, m_exceptThisCharacter);
             return;
         }
 
-        ReorderCharacters2(m_belowAllColumns, m_bothCharactersOnSameLevel);
+        ReorderCharacters(m_belowAllColumns, m_bothCharactersOnSameLevel);
     }
 
-    private void ReorderCharacters(int layer)
-    {
-        if (m_playerSpriteRenderer.transform.position.y > m_enemySpriteRenderer.transform.position.y)
-        {
-            m_playerSpriteRenderer.sortingOrder = m_firstLayer + layer;
-            m_enemySpriteRenderer.sortingOrder = m_secondLayer + layer;
-        }
-        else
-        {
-            m_playerSpriteRenderer.sortingOrder = m_secondLayer + layer;
-            m_enemySpriteRenderer.sortingOrder = m_firstLayer + layer;
-        }
-    }
-
-    private void ReorderCharacters2(int layer, int layer2)
+    private void ReorderCharacters(int layer, int layer2)
     {
         if (m_playerSpriteRenderer.transform.position.y > m_enemySpriteRenderer.transform.position.y)
         {

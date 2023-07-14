@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -28,14 +27,14 @@ public class PlayerController : MonoBehaviour
 
     private bool m_canDash = true;
     private bool m_isDashing = false;
-   
 
     private void Awake()
     {
-        m_animator = GetComponent<Animator>();
-        m_spriteRenderer = GetComponent<SpriteRenderer>();
         m_playerRigidbody2D = GetComponent<Rigidbody2D>();
-        m_playerSword = GetComponentInChildren<Transform>().Find("PlayerSword");
+        Transform playerSprite = GetComponentInChildren<Transform>().Find("Sprite");
+        m_spriteRenderer = playerSprite.GetComponent<SpriteRenderer>();
+        m_animator = playerSprite.GetComponent<Animator>();
+        m_playerSword = playerSprite.GetComponentInChildren<Transform>().Find("PlayerSword");
         m_trailRenderer= GetComponentInChildren<TrailRenderer>();
         m_playerHitBox = transform.GetComponentInChildren<Transform>().Find("PlayerHitBox");
     }
@@ -172,7 +171,6 @@ public class PlayerController : MonoBehaviour
         }
 
         m_playerRigidbody2D.velocity = m_playerSpeed * Time.fixedDeltaTime * m_movement.normalized;
-        Debug.Log("Velocity : " + m_playerRigidbody2D.velocity);
     }
 
     // Source : https://www.youtube.com/watch?v=0v_H3oOR0aU
@@ -187,15 +185,5 @@ public class PlayerController : MonoBehaviour
         m_isDashing = false;
         yield return new WaitForSeconds(m_dashingCooldown);
         m_canDash = true;
-    }
-
-    public void OnAttackEnd()
-    {
-        m_animator.SetBool("IsAttacking", false);
-    }
-
-    public void OnEndOfDamageAnim()
-    {
-        m_animator.SetBool("IsReceivingDamage", false);
     }
 }

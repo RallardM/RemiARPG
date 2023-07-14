@@ -19,7 +19,9 @@ public class HitBox : MonoBehaviour
         m_characterTransform = transform.parent;
         m_characterGameObject = transform.parent.gameObject;
         m_hitBoxRigidbody = GetComponent<Rigidbody2D>();
-        m_chatacterAnimator = transform.parent.GetComponent<Animator>();
+        Transform character = transform.parent;
+        GameObject Sprite = character.Find("Sprite").gameObject;
+        m_chatacterAnimator = Sprite.GetComponent<Animator>();
     }
 
     private void FixedUpdate()
