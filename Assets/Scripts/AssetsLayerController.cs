@@ -24,8 +24,12 @@ public class AssetsLayerController : MonoBehaviour
     {
         GameObject charactersGameObject = GameObject.Find("Characters");
         GameObject tilemapsGameObject = GameObject.Find("Tilemaps");
-        m_playerSpriteRenderer = charactersGameObject.transform.Find("Player").GetComponent<SpriteRenderer>();
-        m_enemySpriteRenderer = charactersGameObject.transform.Find("Enemy").GetComponent<SpriteRenderer>();
+        Transform player = charactersGameObject.transform.Find("Player");
+        Transform playerSprite = player.transform.Find("Sprite");
+        m_playerSpriteRenderer = playerSprite.GetComponent<SpriteRenderer>();
+        Transform enemy = charactersGameObject.transform.Find("Enemy");
+        Transform enemySprite = enemy.transform.Find("Sprite");
+        m_enemySpriteRenderer = enemySprite.GetComponent<SpriteRenderer>();
         m_topLeftColumn = tilemapsGameObject.transform.Find("TopLeftColumn").GetComponent<Transform>();
         m_bottomLeftColumn = tilemapsGameObject.transform.Find("BottomLeftColumn").GetComponent<Transform>();
     }
@@ -54,12 +58,6 @@ public class AssetsLayerController : MonoBehaviour
             return;
         }
 
-        if (m_playerSpriteRenderer.transform.position.y < m_topLeftColumn.transform.position.y)
-        {
-            m_playerSpriteRenderer.sortingOrder = m_firstLayer + m_betweenColumns;
-            return;
-        }
-
         if (m_playerSpriteRenderer.transform.position.y > m_bottomLeftColumn.transform.position.y)
         {
             m_playerSpriteRenderer.sortingOrder = m_firstLayer + m_betweenColumns;
@@ -69,6 +67,12 @@ public class AssetsLayerController : MonoBehaviour
         if (m_playerSpriteRenderer.transform.position.y < m_bottomLeftColumn.transform.position.y)
         {
             m_playerSpriteRenderer.sortingOrder = m_firstLayer + m_belowAllColumns;
+            return;
+        }
+
+        if (m_playerSpriteRenderer.transform.position.y < m_topLeftColumn.transform.position.y)
+        {
+            m_playerSpriteRenderer.sortingOrder = m_firstLayer + m_betweenColumns;
             return;
         }
 
